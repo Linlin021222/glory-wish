@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>荣耀祈愿 · 峡谷许愿池</title>
+<meta name="theme-color" content="#070a14" />
+<link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+
+<div class="scene">
+  <div class="stars" id="stars"></div>
+  <div class="motes" id="motes"></div>
+</div>
+<canvas id="fx-canvas"></canvas>
+
+<header class="top-bar">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark"></div>
+      <div>
+        <div class="brand-name" id="siteName">荣耀祈愿</div>
+        <div class="brand-sub" id="subtitle">GLORY WISH</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="coin-chip" id="coinChip" title="我的余额">
+      <span class="c" id="coinIcon"></span><span id="coinNum">0</span>
+    </div>
+    <button class="btn sm" id="btnRecharge">充值</button>
+    <div class="me-chip" id="meChip" title="点击管理我的账号">
+      <span class="avatar" id="avatar">?</span>
+      <span id="meNick">召唤师</span>
+    </div>
+    <a class="btn sm ghost" href="/admin" target="_blank">后台</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="notice-bar" id="noticeBar" style="display:none">
+    <span id="noticeIcon"></span><span id="noticeText"></span>
+  </div>
+
+  <div class="layout">
+    <!-- 祈愿舞台 -->
+    <section class="panel stage">
+      <div class="stage-title" id="stageTitle">峡 谷 许 愿 池</div>
+      <div class="crystal-zone">
+        <div class="ring a"></div>
+        <div class="ring b"></div>
+        <div class="ring c"></div>
+        <div class="crystal" id="crystal"></div>
+      </div>
+
+      <div class="pity-wrap" id="pityWrap">
+        <div class="pity-line">
+          <span>距离保底 <b id="pityType">传说</b> 还需 <b id="pityLeft">60</b> 抽</span>
+          <span id="pityCount">已抽 0 次</span>
+        </div>
+        <div class="pity-bar"><div class="pity-fill" id="pityFill" style="width:0%"></div></div>
+        <div class="pity-line mt8" id="urLine">
+          <span>荣耀水晶保底进度</span>
+          <span id="urLeft">0 / 360</span>
+        </div>
+        <div class="pity-bar"><div class="pity-fill ur" id="urFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="draw-actions">
+        <button class="draw-btn" id="drawOne">
+          祈愿一次
+          <span class="sub" id="drawOneSub">消耗 100 祈愿币</span>
+        </button>
+        <button class="draw-btn five" id="drawFive">
+          五连祈愿
+          <span class="sub" id="drawFiveSub">消耗 500 祈愿币 · 必出史诗</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 侧栏 -->
+    <aside class="side">
+      <div class="panel panel-pad" id="poolPanel">
+        <div class="card-title">奖品概率公示</div>
+        <div class="rarity-tabs mt8" id="rarityTabs"></div>
+        <div class="mt8" id="poolList"></div>
+        <div class="faint small mt8" id="poolFoot"></div>
+      </div>
+
+      <div class="panel panel-pad" id="feedPanel">
+        <div class="card-title">峡谷播报</div>
+        <div class="mt8" id="feedList"></div>
+      </div>
+
+      <div class="panel panel-pad" id="bagPanel">
+        <div class="card-title">我的战绩</div>
+        <div class="mt8 small dim" id="myStats">暂无记录</div>
+        <div class="mt8">
+          <button class="btn sm" id="btnBag">查看战利品</button>
+          <button class="btn sm ghost" id="btnRecords">抽卡记录</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="center faint small" style="margin-top:18px" id="footerNote">本站奖品均为虚拟道具，请理性娱乐</div>
+</div>
+
+<!-- 浮动工具条 -->
+<div class="foot-tools">
+  <button class="btn solid" id="btnQuick">快捷充值</button>
+</div>
+
+<!-- 揭示层 -->
+<div class="reveal-layer" id="reveal">
+  <div class="beam" id="beam"></div>
+  <div class="shock-ring" id="shock"></div>
+  <div class="hand-area" id="handArea"></div>
+  <div class="reveal-hint" id="revealHint">点击卡片，揭晓命运</div>
+  <div class="reveal-toolbar">
+    <button class="btn sm" id="skipBtn">全部翻开</button>
+    <button class="btn sm ghost" id="closeReveal">收下战利品</button>
+  </div>
+</div>
+
+<!-- 通用弹窗 -->
+<div class="modal" id="modal">
+  <div class="panel modal-body" id="modalBody"></div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script src="/js/icons.js"></script>
+<script src="/js/fx.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
