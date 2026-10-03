@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>荣耀祈愿 · 管理后台</title>
+<link rel="stylesheet" href="/css/main.css" />
+<link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+<div class="scene">
+  <div class="stars" id="stars"></div>
+  <div class="motes" id="motes"></div>
+</div>
+<canvas id="fx-canvas"></canvas>
+
+<!-- 登录 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="panel login-card">
+    <div class="login-hero">
+      <div class="mark" id="loginMark"></div>
+      <div style="font-family:'STZhongsong',serif;font-size:20px;letter-spacing:4px;color:var(--gold-2)">管理后台</div>
+      <div class="faint small mt8">荣耀祈愿 · GLORY WISH</div>
+    </div>
+    <div style="padding:0 20px 22px">
+      <div class="field"><label>管理员密码</label>
+        <input class="input" id="pwInput" type="password" placeholder="输入后台密码" />
+      </div>
+      <button class="btn solid" id="loginBtn" style="width:100%">进 入 后 台</button>
+      <div class="faint small center mt8">忘记密码？删除 data/db.json 后重启服务即可重置</div>
+    </div>
+  </div>
+</div>
+
+<!-- 主体 -->
+<div id="adminMain" style="display:none">
+  <div class="top-bar">
+    <div class="admin-head">
+      <div class="row" style="gap:10px">
+        <div class="brand-mark" id="headMark"></div>
+        <div>
+          <div class="brand-name" style="font-size:16px">管理后台</div>
+          <div class="brand-sub" id="headSite">荣耀祈愿</div>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <a class="btn sm ghost" href="/" target="_blank">查看前台</a>
+      <button class="btn sm ghost" id="refreshBtn">刷新</button>
+      <a class="btn sm ghost" id="exportBtn" href="/api/admin/export">导出数据</a>
+      <button class="btn sm ghost" id="logoutBtn">退出</button>
+    </div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="dash">概览</div>
+      <div class="tab" data-tab="prizes">奖池与概率</div>
+      <div class="tab" data-tab="rules">规则与外观</div>
+      <div class="tab" data-tab="pay">充值审核<span class="dot" id="payDot" style="display:none">0</span></div>
+      <div class="tab" data-tab="users">用户管理</div>
+      <div class="tab" data-tab="records">抽卡记录</div>
+      <div class="tab" data-tab="logs">操作日志</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- 概览 -->
+    <section class="panel sec" data-sec="dash">
+      <div class="card-title">运营概览</div>
+      <div class="grid-stats mt12" id="statGrid"></div>
+      <div class="divider"></div>
+      <div class="card-title">稀有度出货分布</div>
+      <div class="mt12" id="rareDist"></div>
+      <div class="hint-box mt12">
+        提示：修改奖池概率后前台会立即生效；收款码在「规则与外观」里上传；用户申请充值后到「充值审核」放行。
+      </div>
+    </section>
+
+    <!-- 奖池 -->
+    <section class="panel sec" data-sec="prizes" style="display:none">
+      <div class="spread">
+        <div class="card-title" style="border:none;padding:0">奖池与概率</div>
+        <div class="toolbar">
+          <button class="btn sm" id="addPrize">+ 新增奖品</button>
+          <button class="btn sm ghost" id="openRatio">概率助手</button>
+          <button class="btn sm ghost" id="restockBtn">一键补货</button>
+          <button class="btn sm solid" id="savePrizes">保存奖池</button>
+        </div>
+      </div>
+      <div class="hint-box mt12">
+        <b>权重</b>决定概率：某项概率 = 该项权重 ÷ 总权重。库存填 <b>-1</b> 表示不限量，填 <b>0</b> 表示暂时下架。库存抽完的奖品会自动退出抽取。
+      </div>
+      <div class="tbl-wrap mt12">
+        <table class="tbl" id="prizeTbl">
+          <thead>
+            <tr>
+              <th class="ic-cell">图标</th>
+              <th>奖品名称</th>
+              <th>描述</th>
+              <th class="w-md">稀有度</th>
+              <th class="w-sm">权重</th>
+              <th style="width:120px">概率</th>
+              <th class="w-sm">库存</th>
+              <th class="w-md">标签</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="prizeBody"></tbody>
+        </table>
+      </div>
+      <div class="row mt12 spread">
+        <div class="small dim">总权重 <b id="totalWeight">0</b> · 奖品 <b id="prizeCount">0</b> 项</div>
+        <button class="btn sm solid" id="savePrizes2">保存奖池</button>
+      </div>
+    </section>
+
+    <!-- 规则 -->
+    <section class="panel sec" data-sec="rules" style="display:none">
+      <div class="card-title">规则与外观</div>
+      <div class="grid2 mt12">
+        <div class="field"><label>站点名称</label><input class="input" id="f_siteName" /></div>
+        <div class="field"><label>副标题</label><input class="input" id="f_subtitle" /></div>
+      </div>
+      <div class="field"><label>公告（前台顶部展示）</label><input class="input" id="f_notice" /></div>
+
+      <div class="divider"></div>
+      <div class="card-title">代币与价格</div>
+      <div class="grid2 mt12">
+        <div class="field"><label>代币名称</label><input class="input" id="f_coinUnit" /></div>
+        <div class="field"><label>充值兑换比例（1 元 = ? 代币）</label><input class="input" id="f_exchangeRate" type="number" min="1" /></div>
+        <div class="field"><label>单抽消耗（代币）</label><input class="input" id="f_drawOnce" type="number" min="1" /></div>
+        <div class="field"><label>五连抽消耗（代币）</label><input class="input" id="f_drawFive" type="number" min="1" /></div>
+        <div class="field"><label>五连额外优惠（代币）</label><input class="input" id="f_drawFiveDiscount" type="number" min="0" /></div>
+        <div class="field"><label>新用户赠送代币</label><input class="input" id="f_welcomeCoins" type="number" min="0" /></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="card-title">保底规则</div>
+      <div class="grid2 mt12">
+        <div class="field"><label>传说保底（多少抽必出 SSR 及以上，0 = 关闭）</label><input class="input" id="f_pitySSR" type="number" min="0" /></div>
+        <div class="field"><label>荣耀保底（多少抽必出 UR，0 = 关闭）</label><input class="input" id="f_pityUR" type="number" min="0" /></div>
+      </div>
+      <div class="switch-row"><div><div class="sr-label">五连抽必出史诗及以上</div><div class="sr-desc">若五张全是普通/稀有，自动升级一张为 SR+</div></div><div class="switch" id="s_five"></div></div>
+      <div class="switch-row"><div><div class="sr-label">前台显示保底进度</div><div class="sr-desc">关闭后玩家看不到距离保底还剩几抽</div></div><div class="switch" id="s_pity"></div></div>
+      <div class="switch-row"><div><div class="sr-label">前台公示奖品概率</div><div class="sr-desc">建议保持开启</div></div><div class="switch" id="s_pool"></div></div>
+      <div class="switch-row"><div><div class="sr-label">站点维护中</div><div class="sr-desc">开启后玩家无法抽奖</div></div><div class="switch" id="s_mt"></div></div>
+      <div class="field mt8"><label>维护提示语</label><input class="input" id="f_mtTip" /></div>
+
+      <div class="divider"></div>
+      <div class="card-title">收款与联系</div>
+      <div class="grid2 mt12">
+        <div class="field"><label>微信号（可选，未上传收款码时展示）</label><input class="input" id="f_wechatId" /></div>
+        <div class="field"><label>收款说明（前台充值弹窗底部）</label><input class="input" id="f_payRemarkTip" /></div>
+      </div>
+      <div class="field">
+        <label>微信收款码</label>
+        <div class="row">
+          <input type="file" id="qrFile" accept="image/*" class="input" />
+          <span id="qrState" class="tiny dim"></span>
+        </div>
+        <div class="mt8" id="qrPreview" style="width:150px"></div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="field"><label>修改管理员密码（留空表示不修改）</label><input class="input" id="f_adminPassword" type="text" placeholder="新的后台密码" /></div>
+      <button class="btn solid" id="saveRules">保存规则</button>
+    </section>
+
+    <!-- 充值审核 -->
+    <section class="panel sec" data-sec="pay" style="display:none">
+      <div class="card-title">充值审核</div>
+      <div class="hint-box mt12">核对微信账单金额与备注里的邀请码一致后点击「放行」，代币会立即发放到用户账户。</div>
+      <div class="tbl-wrap mt12">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>用户</th><th>金额</th><th>发放代币</th><th>备注/邀请码</th><th>截图</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="payBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 用户 -->
+    <section class="panel sec" data-sec="users" style="display:none">
+      <div class="card-title">用户管理</div>
+      <div class="tbl-wrap mt12">
+        <table class="tbl">
+          <thead><tr><th>昵称</th><th>邀请码</th><th>余额</th><th>抽数</th><th>SSR保底</th><th>UR保底</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody id="userBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 记录 -->
+    <section class="panel sec" data-sec="records" style="display:none">
+      <div class="spread">
+        <div class="card-title" style="border:none;padding:0">抽卡记录（最近 200 条）</div>
+        <button class="btn sm danger" id="clearRecords">清空记录</button>
+      </div>
+      <div class="tbl-wrap mt12">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>用户</th><th>奖品</th><th>稀有度</th></tr></thead>
+          <tbody id="recBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 日志 -->
+    <section class="panel sec" data-sec="logs" style="display:none">
+      <div class="card-title">操作日志</div>
+      <div class="tbl-wrap mt12">
+        <table class="tbl">
+          <thead><tr><th>时间</th><th>操作</th><th>详情</th></tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="panel modal-body" id="modalBody"></div></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script src="/js/icons.js"></script>
+<script src="/js/fx.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>
