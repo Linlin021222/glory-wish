@@ -1,0 +1,14 @@
+{
+  "name": "glory-wish-lottery",
+  "version": "1.0.0",
+  "description": "荣耀祈愿 - 王者荣耀风格在线抽奖系统（代币/保底/后台可控）",
+  "main": "server.js",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}
